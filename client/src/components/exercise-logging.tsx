@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import WorkoutSlider from "./workout-slider";
+import WheelSlider from "./wheel-slider";
 import { apiRequest } from "@/lib/queryClient";
 import { Exercise, InsertWorkoutSet } from "@shared/schema";
 import { convertWeight } from "@/lib/fitness-data";
@@ -164,9 +164,9 @@ export default function ExerciseLogging({
         </div>
       </div>
 
-      {/* Sliders */}
-      <div className="space-y-6 mb-6">
-        <WorkoutSlider
+      {/* Wheel Sliders */}
+      <div className="space-y-8 mb-6">
+        <WheelSlider
           label="Weight"
           value={weight}
           min={0}
@@ -177,7 +177,7 @@ export default function ExerciseLogging({
           testId="weight"
         />
         
-        <WorkoutSlider
+        <WheelSlider
           label="Sets"
           value={sets}
           min={1}
@@ -186,7 +186,7 @@ export default function ExerciseLogging({
           testId="sets"
         />
         
-        <WorkoutSlider
+        <WheelSlider
           label="Reps"
           value={reps}
           min={1}
