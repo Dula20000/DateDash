@@ -25,33 +25,38 @@ export default function WheelSlider({
   testId
 }: WheelSliderProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStartY, setDragStartY] = useState(0);
+  const [dragStartX, setDragStartX] = useState(0);
   const [dragStartValue, setDragStartValue] = useState(0);
+  const [rotation, setRotation] = useState(0);
   const wheelRef = useRef<HTMLDivElement>(null);
 
-  // Calculate rotation angle based on value
+  // Calculate rotation based on value
   const range = max - min;
   const normalizedValue = (value - min) / range;
-  const rotation = normalizedValue * 360;
+  const targetRotation = normalizedValue * 360;
 
-  // Generate tick marks
-  const tickCount = Math.min(60, range / step);
-  const ticks = Array.from({ length: tickCount }, (_, i) => {
-    const angle = (i / (tickCount - 1)) * 360;
-    const isMainTick = i % Math.ceil(tickCount / 12) === 0;
-    return { angle, isMainTick };
+  useEffect(() => {
+    setRotation(targetRotation);
+  }, [targetRotation]);
+
+  // Generate ridges for the wheel edge
+  const ridgeCount = 40;
+  const ridges = Array.from({ length: ridgeCount }, (_, i) => {
+    const angle = (i / ridgeCount) * 360;
+    const isMainRidge = i % 5 === 0;
+    return { angle, isMainRidge };
   });
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
-    setDragStartY(e.clientY);
+    setDragStartX(e.clientX);
     setDragStartValue(value);
     e.preventDefault();
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsDragging(true);
-    setDragStartY(e.touches[0].clientY);
+    setDragStartX(e.touches[0].clientX);
     setDragStartValue(value);
     e.preventDefault();
   };
@@ -60,9 +65,9 @@ export default function WheelSlider({
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging) return;
       
-      const deltaY = dragStartY - e.clientY;
-      const sensitivity = 2;
-      const deltaValue = (deltaY / sensitivity) * step;
+      const deltaX = e.clientX - dragStartX;
+      const sensitivity = 3;
+      const deltaValue = (deltaX / sensitivity) * step;
       const newValue = Math.min(max, Math.max(min, dragStartValue + deltaValue));
       
       onChange(Math.round(newValue / step) * step);
@@ -71,9 +76,9 @@ export default function WheelSlider({
     const handleTouchMove = (e: TouchEvent) => {
       if (!isDragging) return;
       
-      const deltaY = dragStartY - e.touches[0].clientY;
-      const sensitivity = 2;
-      const deltaValue = (deltaY / sensitivity) * step;
+      const deltaX = e.touches[0].clientX - dragStartX;
+      const sensitivity = 3;
+      const deltaValue = (deltaX / sensitivity) * step;
       const newValue = Math.min(max, Math.max(min, dragStartValue + deltaValue));
       
       onChange(Math.round(newValue / step) * step);
@@ -97,7 +102,7 @@ export default function WheelSlider({
       document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('touchend', handleEnd);
     };
-  }, [isDragging, dragStartY, dragStartValue, min, max, step, onChange]);
+  }, [isDragging, dragStartX, dragStartValue, min, max, step, onChange]);
 
   return (
     <div className={cn("bg-card border border-border rounded-xl p-6", className)}>
@@ -105,81 +110,101 @@ export default function WheelSlider({
         {label}
       </label>
       
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center relative">
         {/* Value Display */}
-        <div className="absolute z-10 pointer-events-none">
+        <div className="absolute z-20 pointer-events-none">
           <span 
-            className="text-4xl font-bold text-primary"
+            className="text-4xl font-bold text-primary drop-shadow-lg"
             data-testid={`${testId}-display`}
           >
             {value}{unit}
           </span>
         </div>
 
-        {/* Wheel Container */}
+        {/* Wheel Side Profile Container */}
         <div
           ref={wheelRef}
           className={cn(
-            "relative w-48 h-48 cursor-grab select-none",
+            "relative w-64 h-32 cursor-grab select-none",
             isDragging && "cursor-grabbing"
           )}
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
           data-testid={`${testId}-wheel`}
         >
-          {/* Outer Ring */}
-          <div className="absolute inset-0 rounded-full border-4 border-primary/20 bg-gradient-to-br from-muted/50 to-muted/80 shadow-inner">
-            {/* Inner Ring */}
-            <div className="absolute inset-4 rounded-full border-2 border-primary/30 bg-gradient-to-br from-background/80 to-muted/60">
-              {/* Center Hub */}
-              <div className="absolute inset-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 border border-primary/50 shadow-lg" />
+          {/* Main Wheel Body - Elliptical shape for side view */}
+          <div className="absolute inset-0 bg-gradient-to-br from-muted via-background to-muted/80 rounded-full border-2 border-primary/30 shadow-lg overflow-hidden">
+            
+            {/* Inner metallic surface */}
+            <div className="absolute inset-2 bg-gradient-to-r from-primary/10 via-background to-primary/10 rounded-full border border-primary/20" />
+            
+            {/* Ridged Edge - Top */}
+            <div 
+              className="absolute top-0 left-0 right-0 h-4 overflow-hidden"
+              style={{ transform: `translateX(${(rotation / 360) * -20}px)` }}
+            >
+              <div className="flex h-full">
+                {Array.from({ length: ridgeCount * 2 }, (_, i) => {
+                  const isMainRidge = i % 5 === 0;
+                  return (
+                    <div
+                      key={i}
+                      className={cn(
+                        "flex-shrink-0 bg-gradient-to-b transition-all duration-100",
+                        isMainRidge 
+                          ? "w-2 from-primary/60 to-primary/30" 
+                          : "w-1 from-primary/40 to-primary/20"
+                      )}
+                      style={{
+                        height: isMainRidge ? '16px' : '12px',
+                        marginRight: '1px'
+                      }}
+                    />
+                  );
+                })}
+              </div>
             </div>
+
+            {/* Ridged Edge - Bottom */}
+            <div 
+              className="absolute bottom-0 left-0 right-0 h-4 overflow-hidden"
+              style={{ transform: `translateX(${(rotation / 360) * 20}px)` }}
+            >
+              <div className="flex h-full">
+                {Array.from({ length: ridgeCount * 2 }, (_, i) => {
+                  const isMainRidge = i % 5 === 0;
+                  return (
+                    <div
+                      key={i}
+                      className={cn(
+                        "flex-shrink-0 bg-gradient-to-t transition-all duration-100",
+                        isMainRidge 
+                          ? "w-2 from-primary/60 to-primary/30" 
+                          : "w-1 from-primary/40 to-primary/20"
+                      )}
+                      style={{
+                        height: isMainRidge ? '16px' : '12px',
+                        marginRight: '1px'
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Left Edge Highlight */}
+            <div className="absolute left-0 top-4 bottom-4 w-2 bg-gradient-to-r from-primary/50 to-transparent rounded-l-full" />
+            
+            {/* Right Edge Shadow */}
+            <div className="absolute right-0 top-4 bottom-4 w-2 bg-gradient-to-l from-black/20 to-transparent rounded-r-full" />
+
+            {/* Center groove lines */}
+            <div className="absolute top-1/2 left-4 right-4 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent transform -translate-y-0.5" />
+            <div className="absolute top-1/2 left-4 right-4 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent transform translate-y-0.5" />
           </div>
 
-          {/* Tick Marks */}
-          <div 
-            className="absolute inset-0 transition-transform duration-150 ease-out"
-            style={{ transform: `rotate(${rotation}deg)` }}
-          >
-            {ticks.map((tick, index) => (
-              <div
-                key={index}
-                className="absolute w-0.5 bg-primary/60 origin-bottom"
-                style={{
-                  height: tick.isMainTick ? '16px' : '8px',
-                  left: '50%',
-                  top: tick.isMainTick ? '4px' : '8px',
-                  transform: `translateX(-50%) rotate(${tick.angle}deg)`,
-                  transformOrigin: '50% calc(100% + 88px)'
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Rotation Indicator */}
-          <div 
-            className="absolute inset-0 transition-transform duration-150 ease-out"
-            style={{ transform: `rotate(${rotation}deg)` }}
-          >
-            <div className="absolute w-1 h-6 bg-accent rounded-full shadow-lg" 
-                 style={{ 
-                   left: '50%', 
-                   top: '-2px', 
-                   transform: 'translateX(-50%)',
-                   filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
-                 }} 
-            />
-          </div>
-
-          {/* Static Reference Marker */}
-          <div className="absolute w-3 h-3 bg-secondary rounded-full shadow-lg border-2 border-background"
-               style={{ 
-                 left: '50%', 
-                 top: '-6px', 
-                 transform: 'translateX(-50%)',
-                 zIndex: 10
-               }} 
-          />
+          {/* Interactive zones for better UX */}
+          <div className="absolute inset-0 rounded-full" />
         </div>
       </div>
 
@@ -187,6 +212,11 @@ export default function WheelSlider({
       <div className="flex justify-between text-xs text-muted-foreground mt-4 px-4">
         <span>{min}{unit}</span>
         <span>{max}{unit}</span>
+      </div>
+      
+      {/* Direction Hint */}
+      <div className="text-center mt-2">
+        <span className="text-xs text-muted-foreground">← Drag to adjust →</span>
       </div>
     </div>
   );
