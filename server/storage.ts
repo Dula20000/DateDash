@@ -102,7 +102,12 @@ export class MemStorage implements IStorage {
 
   async createExercise(insertExercise: InsertExercise): Promise<Exercise> {
     const id = randomUUID();
-    const exercise: Exercise = { ...insertExercise, id };
+    const exercise: Exercise = { 
+      ...insertExercise, 
+      id,
+      isCustom: insertExercise.isCustom ?? false,
+      userId: insertExercise.userId ?? null
+    };
     this.exercises.set(id, exercise);
     return exercise;
   }
@@ -156,6 +161,7 @@ export class MemStorage implements IStorage {
     const workoutSet: WorkoutSet = { 
       ...insertWorkoutSet, 
       id,
+      unit: insertWorkoutSet.unit || "lbs",
       completedAt: new Date()
     };
     this.workoutSets.set(id, workoutSet);

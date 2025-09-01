@@ -18,7 +18,7 @@ export default function ExerciseSelection({
 }: ExerciseSelectionProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: exercises = [], isLoading } = useQuery({
+  const { data: exercises = [], isLoading } = useQuery<Exercise[]>({
     queryKey: ["/api/exercises/category", category],
     enabled: !!category
   });

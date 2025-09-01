@@ -7,11 +7,17 @@ import { formatDate, formatShortDate, mockUserId } from "@/lib/fitness-data";
 import { Workout } from "@shared/schema";
 
 export default function Dashboard() {
-  const { data: workouts = [], isLoading } = useQuery({
+  const { data: workouts = [], isLoading } = useQuery<Workout[]>({
     queryKey: ["/api/users", mockUserId, "workouts"]
   });
 
-  const { data: stats } = useQuery({
+  const { data: stats } = useQuery<{
+    totalVolume: number;
+    averageImprovement: number;
+    personalBests: { exerciseName: string; weight: number; reps: number; date: string }[];
+    mostFrequentExercise: string;
+    averageRepsPerSet: number;
+  }>({
     queryKey: ["/api/users", mockUserId, "stats"]
   });
 

@@ -11,11 +11,18 @@ export default function Progress() {
   const [timeframe, setTimeframe] = useState("month");
   const [category, setCategory] = useState("all");
 
-  const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ["/api/users", mockUserId, "stats", { timeframe }]
+  const { data: stats, isLoading: statsLoading } = useQuery<{
+    totalVolume: number;
+    averageImprovement: number;
+    personalBests: { exerciseName: string; weight: number; reps: number; date: string }[];
+    mostFrequentExercise: string;
+    averageRepsPerSet: number;
+  }>({
+    queryKey: ["/api/users", mockUserId, "stats"],
+    queryFn: () => fetch(`/api/users/${mockUserId}/stats?timeframe=${timeframe}`).then(res => res.json())
   });
 
-  const { data: workouts = [], isLoading: workoutsLoading } = useQuery({
+  const { data: workouts = [], isLoading: workoutsLoading } = useQuery<Workout[]>({
     queryKey: ["/api/users", mockUserId, "workouts"]
   });
 
@@ -140,7 +147,7 @@ export default function Progress() {
                 across all exercises.
               </p>
               <div className="space-y-1 text-sm text-muted-foreground">
-                {stats?.personalBests?.length > 0 && (
+                {stats?.personalBests && stats.personalBests.length > 0 && (
                   <p className="flex items-center">
                     <Award className="mr-2" size={16} />
                     New Personal Best: {stats.personalBests[0].exerciseName} - {stats.personalBests[0].weight} lbs ({stats.personalBests[0].reps} reps)
@@ -182,7 +189,7 @@ export default function Progress() {
             </div>
           ) : recentWorkouts.length > 0 ? (
             <div className="space-y-3">
-              {recentWorkouts.map((workout: Workout, index) => {
+              {recentWorkouts.map((workout: Workout, index: number) => {
                 const borderColors = ["border-primary", "border-secondary", "border-accent"];
                 return (
                   <div 
