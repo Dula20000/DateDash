@@ -1,0 +1,72 @@
+1. Home Screen / Dashboard
+Upon opening the app, the user would see a clean dashboard.
+
+Current Date: Prominently displayed.
+"Start New Workout" Button: The primary call to action.
+"View Progress" Button: To access historical data and trends.
+Quick Stats (Optional): Could show a brief summary like "Last Workout: Yesterday" or "This Week's Volume: X lbs."
+2. Start New Workout Flow
+Clicking "Start New Workout" would lead to the exercise selection screen.
+
+Category Selection:
+Users could choose between predefined categories like:
+Upper Body
+Lower Body
+Back
+Push
+Pull
+Legs
+Full Body
+Or a custom category if the app allows
+This could be implemented as a horizontal scrolling list of buttons or a dropdown menu.
+Exercise List:
+Once a category is selected, a list of common exercises for that category appears.
+A search bar would allow users to quickly find specific exercises.
+"Add Custom Exercise" option for new or unique movements.
+Logging Exercise Data:
+After selecting an exercise (e.g., "Bench Press"), the logging interface appears.
+Weight, Sets, Reps Dials: Three horizontal "slider" type dials, each with a clear numerical display of the current value. Users would swipe horizontally to adjust the numbers.
+Unit Toggle: Directly below the dials, a prominent toggle button or switch for "Lbs / Kg." This would convert the displayed and logged weight.
+"Add Set" Button: Allows users to add multiple sets for the same exercise. Each set logged would capture the weight, reps, and the date/time.
+"Finish Exercise" / "Add Another Exercise" Buttons: To complete the current exercise logging and either return to the exercise selection or finish the workout.
+3. View Progress Section
+This section is where users can visualize their historical data and trends.
+
+Workout Log List: A chronological list of all past workouts, showing the date and perhaps a summary (e.g., "Upper Body Workout - 5 Exercises"). Tapping on a workout would show all exercises, sets, and reps for that specific date.
+Trend Analysis (The "Magic" Part):
+Filter Options: Users can filter trends by:
+Timeframe: Last week, last month, last 3 months, last year, all time.
+Category: Upper Body, Lower Body, Push, Pull, Leg, Specific Muscle Group (e.g., Chest, Biceps).
+Specific Exercise: (e.g., Bench Press, Squat, Deadlift).
+Visualization:
+Graphs: Line graphs showing weight progression over time for an exercise or category. Bar charts showing total volume for a period.
+Key Metrics:
+"Over the last month, your upper body weights went up an average of 22% over all muscle groups." (This would involve calculating the average percentage increase in the heaviest set for all upper body exercises logged within that period).
+"New Personal Best: Bench Press - 225 lbs (5 reps) on [Date]"
+"Total Volume this week: 15,000 lbs"
+"Most Frequent Exercise: [Exercise Name]"
+"Average Reps per Set: X"
+Example User Flow: Logging a Workout
+User opens app
+Taps "Start New Workout"
+Selects "Upper Body" category
+Selects "Bench Press" from the list
+Adjusts "Weight" dial to 185, "Sets" to 1, "Reps" to 8. Unit is "Lbs."
+Taps "Add Set"
+Adjusts "Weight" dial to 185, "Sets" to 2, "Reps" to 6.
+Taps "Add Set"
+Taps "Add Another Exercise"
+Selects "Overhead Press"
+Logs sets for Overhead Press.
+Taps "Finish Workout"
+Example User Flow: Viewing Progress
+User opens app
+Taps "View Progress"
+Sees a list of past workouts.
+Taps on "Trends"
+Filters "Timeframe: Last Month"
+Filters "Category: Upper Body"
+App displays a graph of overall upper body weight progression and a summary: "Over the last month, your upper body weights went up an average of 15%."
+User then selects "Specific Exercise: Bench Press"
+App shows a line graph of Bench Press 1RM (or heaviest set) over the last month, along with stats like "New PB: 200 lbs x 5 reps."
+This app concept provides a solid foundation for a user-friendly fitness tracker focused on practical logging and insightful progress visualization.
