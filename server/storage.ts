@@ -289,8 +289,36 @@ export class MemStorage implements IStorage {
     const mostFrequentExercise = mostFrequentExerciseId ? 
       this.exercises.get(mostFrequentExerciseId)?.name || "" : "";
 
-    // Calculate average improvement (simplified)
-    const averageImprovement = 15; // Placeholder calculation
+    // Calculate average improvement based on actual data
+    let averageImprovement = 0;
+    if (allSets.length > 0) {
+      // Group sets by exercise to calculate improvement
+      const exerciseProgressMap = new Map<string, number[]>();
+      allSets.forEach(set => {
+        const weights = exerciseProgressMap.get(set.exerciseId) || [];
+        weights.push(parseFloat(set.weight));
+        exerciseProgressMap.set(set.exerciseId, weights);
+      });
+
+      let totalImprovement = 0;
+      let exercisesWithProgress = 0;
+      
+      exerciseProgressMap.forEach(weights => {
+        if (weights.length >= 2) {
+          const firstWeight = weights[0];
+          const lastWeight = weights[weights.length - 1];
+          if (firstWeight > 0) {
+            const improvement = ((lastWeight - firstWeight) / firstWeight) * 100;
+            totalImprovement += improvement;
+            exercisesWithProgress++;
+          }
+        }
+      });
+
+      if (exercisesWithProgress > 0) {
+        averageImprovement = Math.round(totalImprovement / exercisesWithProgress);
+      }
+    }
 
     return {
       totalVolume,
